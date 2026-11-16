@@ -24,17 +24,21 @@ def sol_to_year(sols: pd.Series) -> tuple[pd.Series, pd.Series]:
 def process_nc(filepath:str) -> pd.DataFrame:
     ds = xr.open_dataset(filepath)
 
-    temp_data = ds["tsurf"].sel(lat=47.2, lon=184.3, method="nearest")
-    pressure_data = ds["ps"].sel(lat=47.2, lon=184.3, method="nearest")
+    temp_data_1 = ds["tsurf"].sel(lat=39.8, lon=202.1, method="nearest")
+    temp_data_8 = ds["tsurf"].sel(lat=40.75, lon=201.3, method="nearest")
+    temp_data_9 = ds["tsurf"].sel(lat=40.02, lon=203.35, method="nearest")
 
-    df_tsurf = temp_data.to_dataframe().reset_index()
-    df_ps = pressure_data.to_dataframe().reset_index()
+    df_tsurf_1 = temp_data_1.to_dataframe().reset_index()
+    df_tsurf_8 = temp_data_8.to_dataframe().reset_index()
+    df_tsurf_9 = temp_data_9.to_dataframe().reset_index()
 
-    df_tsurf -= 273.15
-    utc, earth_time = sol_to_year(df_tsurf['time'])
+    df_tsurf_1["tsurf"] -= 273.15
+    df_tsurf_8["tsurf"] -= 273.15
+    df_tsurf_9["tsurf"] -= 273.15
+    utc, earth_time = sol_to_year(df_tsurf_1['time'])
 
     surf_df = pd.concat([
-            df_tsurf['time'], 
+            df_tsurf_1['time'], 
             earth_time, 
             utc.dt.year, 
             utc.dt.month, 
@@ -42,8 +46,9 @@ def process_nc(filepath:str) -> pd.DataFrame:
             utc.dt.hour,
             utc.dt.minute,
             utc.dt.second, 
-            df_tsurf['tsurf'], 
-            df_ps['ps']
+            df_tsurf_1['tsurf'], 
+            df_tsurf_8['tsurf'], 
+            df_tsurf_9['tsurf']
         ], axis=1)
 
     cols = list(surf_df.columns)
@@ -56,8 +61,9 @@ def process_nc(filepath:str) -> pd.DataFrame:
     cols[5] = "Hour"
     cols[6] = "Minute"
     cols[7] = "Second"
-    cols[8] = "Surface Temperature (°C)"
-    cols[9] = "Pressure (Pa)"
+    cols[8] = "Surface Temperature AP-1 (°C)"
+    cols[9] = "Surface Temperature AP-8 (°C)"
+    cols[10] = "Surface Temperature AP-9 (°C)"
 
     surf_df.columns = cols
 
