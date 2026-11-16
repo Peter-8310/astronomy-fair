@@ -34,27 +34,9 @@ dose_dataframe = pd.DataFrame({
         }
     )
 
-print(dose_dataframe)
-
 def rieman_sum(df:pd.DataFrame, year:int):
-    
     year_dose = df[df['Year'].between(year, year)]
-    
-    net_dose = 0.0
-    net_dose_lower = 0.0
-    net_dose_higher = 0.0
-    
-    for row in year_dose.itertuples():
-        
-        dose = float(cast(float, row.dose))
-        lower_dose = float(cast(float, row.lower_dose))
-        higher_dose = float(cast(float, row.higher_dose))
-    
-        net_dose += dose
-        net_dose_higher += higher_dose
-        net_dose_lower += lower_dose
-    
-    return net_dose, net_dose_higher, net_dose_lower
+    return sum(year_dose['dose']), sum(year_dose['higher_dose']), sum(year_dose['lower_dose'])
 
 
 yr_dose = []
@@ -81,7 +63,7 @@ ax.fill_between(
     yr_df["High yearly dose (mSv)"],
     color="steelblue",
     alpha=0.2,
-    label="Lower/upper estimates",
+    label="Margin of error",
 )
 ax.plot(
     yr_df["Year"],
@@ -102,7 +84,7 @@ ax_daily.errorbar(
     marker="o",
     capsize=4,
     linestyle="none",
-    label="Average daily dose (min-max span)",
+    label="Daily dose (min-max span)",
 )
 ax.set_title("Yearly Dose (2010-2021)")
 ax.set_xlabel("Year")
@@ -110,7 +92,7 @@ ax.set_ylabel("Yearly dose (mSv)", color="navy")
 ax.tick_params(axis="y", colors="navy")
 ax.spines["left"].set_color("navy")
 ax.set_xticks(yr_df["Year"])
-ax_daily.set_ylabel("Daily dose (µSv)", color="darkorange")
+ax_daily.set_ylabel("Average daily dose (µSv)", color="darkorange")
 ax_daily.tick_params(axis="y", colors="darkorange")
 ax_daily.spines["right"].set_color("darkorange")
 ax.grid(True, alpha=0.3)

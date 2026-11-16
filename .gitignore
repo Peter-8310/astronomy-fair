@@ -8,3 +8,5 @@ wheels/
 
 # Virtual environments
 .venv
+# Temperature data (Too much storage usage)
+/src/Temperature/Mars_surface_dataset
